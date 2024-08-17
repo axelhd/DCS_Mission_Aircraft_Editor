@@ -3,8 +3,6 @@ import csv as csv_module
 import json
 from collections import defaultdict
 import sys
-import shutil
-import re
 
 csv_file = sys.argv[1]
 mission = sys.argv[2]
