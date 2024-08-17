@@ -4,9 +4,9 @@ import json
 from collections import defaultdict
 import sys
 
-csv_file = sys.argv[1]
+csv_file = f"output/{sys.argv[1]}"
 mission = sys.argv[2]
-output = sys.argv[3]
+output = f"output/{sys.argv[3]}"
 
 # Read the CSV file and parse the data
 data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))

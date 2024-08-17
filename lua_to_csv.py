@@ -4,7 +4,7 @@ import sys
 
 
 input = sys.argv[1]
-output = sys.argv[2]
+output = f"output/{sys.argv[2]}.csv"
 
 # Read the Lua data
 data = luadata.read(input, encoding="utf-8")
@@ -42,4 +42,4 @@ with open(output, mode='w', newline='', encoding='utf-8') as file:
                             [coalition, country_name, group_name, unit_name, unit_type, x_coord, y_coord, task, skill,
                              heading, fuel])
 
-print("Data has been successfully exported to mission_data.csv")
+print(f"Data has been successfully exported to {output}")
