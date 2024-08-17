@@ -74,10 +74,6 @@ with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
 # Load the existing Lua data
 lua_data = luadata.read(mission, encoding="utf-8")
 
-# Print Lua Data for Debugging
-print("Loaded Lua Data:")
-print(json.dumps(lua_data, indent=4))
-
 # Update the Lua data with the new data
 for coalition, coalition_data in data.items():
     if coalition not in lua_data["coalition"]:
