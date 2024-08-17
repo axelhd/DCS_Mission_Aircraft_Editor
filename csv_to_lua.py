@@ -1,18 +1,20 @@
 import luadata
-import csv
+import csv as csv_module
 import json
 from collections import defaultdict
 import sys
+import shutil
+import re
 
-csv = sys.argv[1]
+csv_file = sys.argv[1]
 mission = sys.argv[2]
 output = sys.argv[3]
 
 # Read the CSV file and parse the data
 data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
 
-with open(csv, mode='r', newline='', encoding='utf-8') as file:
-    reader = csv.DictReader(file)
+with open(csv_file, mode='r', newline='', encoding='utf-8') as file:
+    reader = csv_module.DictReader(file)
 
     for row in reader:
         coalition = row["Coalition"]
