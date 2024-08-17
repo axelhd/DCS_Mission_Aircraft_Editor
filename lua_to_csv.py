@@ -1,11 +1,16 @@
 import luadata
 import csv
+import sys
+
+
+input = sys.argv[1]
+output = sys.argv[2]
 
 # Read the Lua data
-data = luadata.read(r"mission", encoding="utf-8")
+data = luadata.read(input, encoding="utf-8")
 
 # Open a CSV file for writing
-with open("mission_data.csv", mode='w', newline='', encoding='utf-8') as file:
+with open(output, mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
 
     # Write the headers
