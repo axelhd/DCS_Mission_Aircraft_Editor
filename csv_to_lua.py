@@ -74,6 +74,12 @@ with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
 # Load the existing Lua data
 lua_data = luadata.read(mission, encoding="utf-8")
 
+# Write Lua Data for Debugging
+if True:
+    print("Loaded Lua Data:")
+    with open("debug_1.json", mode="w", encoding="utf-8") as file:
+        json.dump(lua_data, file, indent=4, ensure_ascii=False)
+
 # Update the Lua data with the new data
 for coalition, coalition_data in data.items():
     if coalition not in lua_data["coalition"]:
@@ -113,7 +119,7 @@ for coalition, coalition_data in data.items():
 
 # write json to file for debugging
 if True:
-    with open("output.json", mode="w", encoding="utf-8") as file:
+    with open("debug_2.json", mode="w", encoding="utf-8") as file:
         json.dump(lua_data, file, indent=4, ensure_ascii=False)
 
 # Write the updated Lua data back to the Lua file
