@@ -6,26 +6,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Convert CSV to Lua")
 
-parser.add_argument(
-    "--csv_file",
-    type=str,
-    required=True,
-    help="Path to the CSV file",
-)
-
-parser.add_argument(
-    "--mission_file",
-    type=str,
-    required=True,
-    help="Path to the mission file",
-)
-
-parser.add_argument(
-    "--output_file",
-    type=str,
-    required=True,
-    help="Path for the mission output file",
-)
+parser.add_argument("--csv_file", type=str, required=True, help="Path to the CSV file")
+parser.add_argument("--mission_file", type=str, required=True, help="Path to the mission file")
+parser.add_argument("--output_file", type=str, required=True, help="Path for the mission output file")
 
 args = parser.parse_args()
 
@@ -38,7 +21,6 @@ data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(l
 
 with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
     reader = csv_module.DictReader(file)
-
     for row in reader:
         coalition = row["Coalition"]
         country = row["Country"]
@@ -75,10 +57,8 @@ with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
 lua_data = luadata.read(mission, encoding="utf-8")
 
 # Write Lua Data for Debugging
-if True:
-    print("Loaded Lua Data:")
-    with open("debug_1.json", mode="w", encoding="utf-8") as file:
-        json.dump(lua_data, file, indent=4, ensure_ascii=False)
+with open("debug_1.json", mode="w", encoding="utf-8") as file:
+    json.dump(lua_data, file, indent=4, ensure_ascii=False)
 
 # Update the Lua data with the new data
 for coalition, coalition_data in data.items():
@@ -87,11 +67,7 @@ for coalition, coalition_data in data.items():
 
     for country, country_data in coalition_data.items():
         country_entry = next(
-            (
-                item
-                for item in lua_data["coalition"][coalition]["country"]
-                if item["name"] == country
-            ),
+            (item for item in lua_data["coalition"][coalition]["country"] if item["name"] == country),
             None,
         )
 
@@ -117,16 +93,28 @@ for coalition, coalition_data in data.items():
             for unit in group_data["units"]:
                 existing_group["units"].append(unit)
 
-# write json to file for debugging
-if True:
-    with open("debug_2.json", mode="w", encoding="utf-8") as file:
-        json.dump(lua_data, file, indent=4, ensure_ascii=False)
+# Write JSON to file for debugging
+with open("debug_2.json", mode="w", encoding="utf-8") as file:
+    json.dump(lua_data, file, indent=4, ensure_ascii=False)
+
+# Convert the data to Lua format preserving the indices
+def json_to_lua(value):
+    if isinstance(value, dict):
+        if all(isinstance(k, int) for k in value.keys()):
+            # Sort keys numerically and format as indexed Lua table
+            return "{\n" + ",\n".join(f"[{k}] = {json_to_lua(v)}" for k, v in sorted(value.items())) + "\n}"
+        else:
+            return "{\n" + ",\n".join(f'["{k}"] = {json_to_lua(v)}' for k, v in value.items()) + "\n}"
+    elif isinstance(value, list):
+        return "{\n" + ",\n".join(f"[{i+1}] = {json_to_lua(v)}" for i, v in enumerate(value)) + "\n}"
+    elif isinstance(value, str):
+        return f'"{value}"'
+    else:
+        return str(value)
 
 # Write the updated Lua data back to the Lua file
-
 with open(output, mode="w", encoding="utf-8") as file:
     file.write("mission = ")
-    # Try saving as JSON for debugging
-    json.dump(lua_data, file, indent=4, ensure_ascii=False)
+    file.write(json_to_lua(lua_data))
 
 print(f"Data has been successfully updated in {output}")
