@@ -1,1 +1,4 @@
 luadata
+pandas
+openpyxl # reqired for pandas csv to excel conversion
+xlsxwriter # reqired for pandas csv to excel conversion

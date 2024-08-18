@@ -2,16 +2,41 @@ import luadata
 import csv as csv_module
 import json
 from collections import defaultdict
-import sys
+import argparse
 
-csv_file = f"output/{sys.argv[1]}"
-mission = sys.argv[2]
-output = f"output/{sys.argv[3]}"
+parser = argparse.ArgumentParser(description="Convert CSV to Lua")
+
+parser.add_argument(
+    "--csv_file",
+    type=str,
+    required=True,
+    help="Path to the CSV file",
+)
+
+parser.add_argument(
+    "--mission_file",
+    type=str,
+    required=True,
+    help="Path to the mission file",
+)
+
+parser.add_argument(
+    "--output_file",
+    type=str,
+    required=True,
+    help="Path for the mission output file",
+)
+
+args = parser.parse_args()
+
+csv_file = args.csv_file
+mission = args.mission_file
+output = args.output_file
 
 # Read the CSV file and parse the data
 data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
 
-with open(csv_file, mode='r', newline='', encoding='utf-8') as file:
+with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
     reader = csv_module.DictReader(file)
 
     for row in reader:
@@ -28,26 +53,32 @@ with open(csv_file, mode='r', newline='', encoding='utf-8') as file:
         fuel = float(row["Fuel"])
 
         # Structure the data to match the Lua format
-        data[coalition][country]["plane"]["group"].append({
-            "name": group_name,
-            "units": [{
-                "name": unit_name,
-                "type": unit_type,
-                "x": x_coord,
-                "y": y_coord,
-                "skill": skill,
-                "heading": heading,
-                "payload": {"fuel": fuel}
-            }],
-            "task": task
-        })
+        data[coalition][country]["plane"]["group"].append(
+            {
+                "name": group_name,
+                "units": [
+                    {
+                        "name": unit_name,
+                        "type": unit_type,
+                        "x": x_coord,
+                        "y": y_coord,
+                        "skill": skill,
+                        "heading": heading,
+                        "payload": {"fuel": fuel},
+                    }
+                ],
+                "task": task,
+            }
+        )
 
 # Load the existing Lua data
 lua_data = luadata.read(mission, encoding="utf-8")
 
-# Print Lua Data for Debugging
-print("Loaded Lua Data:")
-print(json.dumps(lua_data, indent=4))
+# Write Lua Data for Debugging
+if True:
+    print("Loaded Lua Data:")
+    with open("debug_1.json", mode="w", encoding="utf-8") as file:
+        json.dump(lua_data, file, indent=4, ensure_ascii=False)
 
 # Update the Lua data with the new data
 for coalition, coalition_data in data.items():
@@ -56,8 +87,12 @@ for coalition, coalition_data in data.items():
 
     for country, country_data in coalition_data.items():
         country_entry = next(
-            (item for item in lua_data["coalition"][coalition]["country"] if item["name"] == country),
-            None
+            (
+                item
+                for item in lua_data["coalition"][coalition]["country"]
+                if item["name"] == country
+            ),
+            None,
         )
 
         if not country_entry:
@@ -66,22 +101,30 @@ for coalition, coalition_data in data.items():
 
         for group_data in country_data["plane"]["group"]:
             group_name = group_data["name"]
-            existing_group = next((g for g in country_entry["plane"]["group"] if g["name"] == group_name), None)
+            existing_group = next(
+                (g for g in country_entry["plane"]["group"] if g["name"] == group_name),
+                None,
+            )
 
             if not existing_group:
-                existing_group = {"name": group_name, "units": [], "task": group_data["task"]}
+                existing_group = {
+                    "name": group_name,
+                    "units": [],
+                    "task": group_data["task"],
+                }
                 country_entry["plane"]["group"].append(existing_group)
 
             for unit in group_data["units"]:
                 existing_group["units"].append(unit)
 
-# Print Updated Lua Data for Debugging
-print("Updated Lua Data:")
-print(json.dumps(lua_data, indent=4))
+# write json to file for debugging
+if True:
+    with open("debug_2.json", mode="w", encoding="utf-8") as file:
+        json.dump(lua_data, file, indent=4, ensure_ascii=False)
 
 # Write the updated Lua data back to the Lua file
 
-with open(output, mode='w', encoding='utf-8') as file:
+with open(output, mode="w", encoding="utf-8") as file:
     file.write("mission = ")
     # Try saving as JSON for debugging
     json.dump(lua_data, file, indent=4, ensure_ascii=False)
