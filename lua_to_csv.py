@@ -6,7 +6,9 @@ import argparse
 
 def validate_path(path):
     if not os.path.exists(path.rsplit('_', 1)[0]):
+        print(path)
         raise FileNotFoundError(f"File {path.rsplit('_', 1)[0]} does not exist!")
+
 
 
 def validate_output_path(path):
