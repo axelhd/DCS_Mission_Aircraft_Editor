@@ -44,3 +44,11 @@ print("Nested table has been written to output file")
 # Add .lua extension
 p = Path(mission)
 p.rename(p.with_suffix('.lua'))
+
+# Cleanup
+with open(mission, "r+") as fp:
+    lines = fp.readlines()
+    fp.seek(0)
+    fp.truncate()
+
+    fp.writelines(lines[:-28])
