@@ -7,9 +7,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Convert CSV to Lua")
 
-parser.add_argument("--csv_file", type=str, required=True, help="Path to the CSV file")
-parser.add_argument("--json_file", type=str, required=True, help="Path to the JSON file")
-parser.add_argument("--output_file", type=str, required=True, help="Path for the mission output file")
+parser.add_argument("--csv", type=str, required=True, help="Path to the CSV file")
+parser.add_argument("--json", type=str, required=True, help="Path to the JSON file")
+parser.add_argument("--out", type=str, required=True, help="Path for the mission output file")
 
 args = parser.parse_args()
 

@@ -8,11 +8,12 @@ The tool will export all coalition's groups and their flights, allowing you to e
 ## Usage
 
 ### Creating an XLSX file from a lua file
-1. `lua_to_csv.py --input <mission file path>`
-2. `csv_to_xlsx.py --input [csv path] --output [output xlsx path]`
+1. `python lua_to_csv.py --input <mission> --output <output>`
+2. `python csv_to_xlsx.py --input [csv path] --output [output xlsx path]`
 
-## Creating a lua file from XLSX file
-1. `xlsx_to_csv --input [xlsx path] --output [output csv path]`
-2. `csv_to_lua --input <csv path> --output <output lua path>`
+### Creating a lua file from XLSX file
+1. `python xlsx_to_csv --input [xlsx path] --output [output csv path]`
+2. `lua <output_file_from_step_1> --output <output>`
+2. `python csv_to_lua --csv <csv path> --out <output lua path> --json <json file path form step 2>`
 
 > Please note that the `csv_to_lua` function is currently a work in progress and may not function properly at this time.
