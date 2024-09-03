@@ -1,5 +1,6 @@
 .venv/
 output/
 
-mission*
+*.miz
+!test.miz
 csv_to_lua_old.py
