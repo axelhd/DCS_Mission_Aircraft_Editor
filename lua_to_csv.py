@@ -2,14 +2,13 @@ import luadata
 import csv
 import os
 import argparse
-
+import zipfile
+import tempfile
 
 def validate_path(path):
     if not os.path.exists(path.rsplit('_', 1)[0]):
         print(path)
         raise FileNotFoundError(f"File {path.rsplit('_', 1)[0]} does not exist!")
-
-
 
 def validate_output_path(path):
     """Ensure the directory for the output file exists, and create it if necessary."""
@@ -20,23 +19,22 @@ def validate_output_path(path):
     elif os.path.isdir(save_path):
         raise ValueError(f"Output path {save_path} is a directory, not a file!")
 
-
 def main():
     default_output = os.path.join(os.getcwd(), "output", "output.csv")
-    parser = argparse.ArgumentParser(description="Convert CSV to XLSX")
+    parser = argparse.ArgumentParser(description="Convert DCS mission to CSV")
 
     parser.add_argument(
         "--input",
         type=str,
         required=True,
-        help="Path to the CSV file to convert to XLSX",
+        help="Path to the .miz file to convert it to CSV",
     )
 
     parser.add_argument(
         "--output",
         type=str,
         default=default_output,
-        help="Output path for the XLSX file",
+        help="Output path for the CSV file",
     )
 
     args = parser.parse_args()
@@ -60,11 +58,27 @@ def main():
     # Validate the output path
     validate_output_path(output)
 
-    # Read the Lua data
-    try:
-        data = luadata.read(_input, encoding="utf-8")
-    except Exception as e:
-        raise ValueError(f"Error reading Lua file {_input}: {e}")
+    # Create a temporary directory
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Extract the mission file from the .miz archive
+        try:
+            with zipfile.ZipFile(_input, 'r') as zip_ref:
+                zip_ref.extract('mission', temp_dir)
+        except zipfile.BadZipFile:
+            raise ValueError(f"Error: {_input} is not a valid .miz file.")
+        except KeyError:
+            raise ValueError(f"Error: 'mission' file not found in {_input}.")
+        except Exception as e:
+            raise ValueError(f"Error extracting mission file from {_input}: {e}")
+
+        # Path to the extracted mission file
+        mission_file = os.path.join(temp_dir, 'mission')
+
+        # Read the Lua data
+        try:
+            data = luadata.read(mission_file, encoding="utf-8")
+        except Exception as e:
+            raise ValueError(f"Error reading Lua file {mission_file}: {e}")
 
     # Open a CSV file for writing
     try:
