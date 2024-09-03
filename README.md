@@ -17,3 +17,6 @@ The tool will export all coalition's groups and their flights, allowing you to e
 3. `python csv_to_lua --csv <csv path> --out <output lua path> --json <json file path form step 2>`
 
 > Please note that the `csv_to_lua` function is currently a work in progress and may not function properly at this time.
+
+## Known issues
+lua_to_csv.py path validation is broken if input file is not in current directory
