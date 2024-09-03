@@ -13,9 +13,9 @@ parser.add_argument("--out", type=str, required=True, help="Path for the mission
 
 args = parser.parse_args()
 
-csv_file = args.csv_file
-json_file = args.mission_file
-output = args.output_file
+csv_file = args.csv
+json_file = args.json
+output = args.out
 
 
 def save_json(data, out_file):
