@@ -2,3 +2,4 @@
 output/
 
 mission*
+csv_to_lua_old.py

@@ -17,7 +17,7 @@ mission = args.mission_file
 output = args.output_file
 
 # Read the CSV file and parse the data
-data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list))))
+data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list)))))
 
 with open(csv_file, mode="r", newline="", encoding="utf-8") as file:
     reader = csv_module.DictReader(file)
@@ -97,6 +97,7 @@ for coalition, coalition_data in data.items():
 with open("debug_2.json", mode="w", encoding="utf-8") as file:
     json.dump(lua_data, file, indent=4, ensure_ascii=False)
 
+
 # Convert the data to Lua format preserving the indices
 def json_to_lua(value):
     if isinstance(value, dict):
@@ -106,11 +107,12 @@ def json_to_lua(value):
         else:
             return "{\n" + ",\n".join(f'["{k}"] = {json_to_lua(v)}' for k, v in value.items()) + "\n}"
     elif isinstance(value, list):
-        return "{\n" + ",\n".join(f"[{i+1}] = {json_to_lua(v)}" for i, v in enumerate(value)) + "\n}"
+        return "{\n" + ",\n".join(f"[{i + 1}] = {json_to_lua(v)}" for i, v in enumerate(value)) + "\n}"
     elif isinstance(value, str):
         return f'"{value}"'
     else:
         return str(value)
+
 
 # Write the updated Lua data back to the Lua file
 with open(output, mode="w", encoding="utf-8") as file:
