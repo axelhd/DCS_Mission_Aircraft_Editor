@@ -75,6 +75,7 @@ def write_csv(output, data):
                     "Skill",
                     "Heading",
                     "Fuel",
+                    "Loadouts",
                 ]
             )
 
@@ -96,6 +97,10 @@ def write_csv(output, data):
                                 skill = unit.get("skill", "Unknown")
                                 heading = unit.get("heading", "Unknown")
                                 fuel = unit.get("payload", {}).get("fuel", "Unknown")
+                                loadouts = unit.get("payload", {}).get("pylons", [])
+
+                                # Convert loadouts to a string representation
+                                loadouts_str = str(loadouts)
 
                                 # Write the row to the CSV file
                                 writer.writerow(
@@ -111,6 +116,7 @@ def write_csv(output, data):
                                         skill,
                                         heading,
                                         fuel,
+                                        loadouts_str,
                                     ]
                                 )
 
