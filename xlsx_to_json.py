@@ -50,19 +50,31 @@ def update_json_structure(reference_data, extracted_data):
             group_data = {"name": group_name, "units": []}
             group_list.append(group_data)
         
-        unit_data = {
-            "name": unit_name,
-            "type": unit_type,
-            "x": x_coord,
-            "y": y_coord,
-            "skill": skill,
-            "heading": heading,
-            "payload": {
-                "fuel": fuel,
-                "pylons": loadouts
+        unit_list = group_data["units"]
+        unit_data = next((u for u in unit_list if u["name"] == unit_name), None)
+        if not unit_data:
+            unit_data = {
+                "name": unit_name,
+                "type": unit_type,
+                "x": x_coord,
+                "y": y_coord,
+                "skill": skill,
+                "heading": heading,
+                "payload": {
+                    "fuel": fuel,
+                    "pylons": loadouts
+                }
             }
-        }
-        group_data["units"].append(unit_data)
+            unit_list.append(unit_data)
+        else:
+            # Update existing unit data
+            unit_data["type"] = unit_type
+            unit_data["x"] = x_coord
+            unit_data["y"] = y_coord
+            unit_data["skill"] = skill
+            unit_data["heading"] = heading
+            unit_data["payload"]["fuel"] = fuel
+            unit_data["payload"]["pylons"] = loadouts
     
     return reference_data
 
