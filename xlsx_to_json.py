@@ -17,9 +17,11 @@ def extract_data_from_xlsx(input_file):
     # Convert the DataFrame to a list of dictionaries
     data = df.to_dict(orient="records")
     
-    # Convert the list of dictionaries to the required JSON structure
-    json_data = {"coalition": {}}
-    for row in data:
+    return data
+
+def update_json_structure(reference_data, extracted_data):
+    # Update the reference JSON structure with the extracted data
+    for row in extracted_data:
         coalition = row["Coalition"]
         country = row["Country"]
         group_name = row["Group Name"]
@@ -33,10 +35,10 @@ def extract_data_from_xlsx(input_file):
         fuel = row["Fuel"]
         loadouts = eval(row["Loadouts"])  # Convert string representation of dict to actual dict
 
-        if coalition not in json_data["coalition"]:
-            json_data["coalition"][coalition] = {"country": []}
+        if coalition not in reference_data["coalition"]:
+            reference_data["coalition"][coalition] = {"country": []}
         
-        country_list = json_data["coalition"][coalition]["country"]
+        country_list = reference_data["coalition"][coalition]["country"]
         country_data = next((c for c in country_list if c["name"] == country), None)
         if not country_data:
             country_data = {"name": country, "plane": {"group": []}}
@@ -62,17 +64,24 @@ def extract_data_from_xlsx(input_file):
         }
         group_data["units"].append(unit_data)
     
-    return json_data
+    return reference_data
 
 def main():
     default_output = os.path.join(os.getcwd(), "output", "output.json")
-    parser = argparse.ArgumentParser(description="Convert XLSX to JSON")
+    parser = argparse.ArgumentParser(description="Convert XLSX to JSON using a reference JSON structure")
 
     parser.add_argument(
         "--input",
         type=str,
         required=True,
         help="Path to the XLSX file to convert to JSON",
+    )
+
+    parser.add_argument(
+        "--reference",
+        type=str,
+        required=True,
+        help="Path to the reference JSON file to maintain the structure",
     )
 
     parser.add_argument(
@@ -86,6 +95,7 @@ def main():
 
     # Ensure the input file path is absolute
     input_file = os.path.abspath(args.input)
+    reference_file = os.path.abspath(args.reference)
 
     # Ensure the output file has the correct extension and is absolute
     output_file = args.output
@@ -95,14 +105,24 @@ def main():
 
     # Extract data from the XLSX file
     try:
-        data = extract_data_from_xlsx(input_file)
+        extracted_data = extract_data_from_xlsx(input_file)
     except Exception as e:
         raise ValueError(f"Error processing XLSX file {input_file}: {e}")
 
-    # Write the data to JSON
+    # Read the reference JSON file
+    try:
+        with open(reference_file, 'r', encoding='utf-8') as f:
+            reference_data = json.load(f)
+    except Exception as e:
+        raise ValueError(f"Error reading reference JSON file {reference_file}: {e}")
+
+    # Update the reference JSON structure with the extracted data
+    updated_data = update_json_structure(reference_data, extracted_data)
+
+    # Write the updated data to JSON
     try:
         with open(output_file, mode="w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
+            json.dump(updated_data, file, ensure_ascii=False, indent=4)
         print(f"Data has been successfully exported to {output_file}")
     except Exception as e:
         raise IOError(f"Error writing to JSON file {output_file}: {e}")
